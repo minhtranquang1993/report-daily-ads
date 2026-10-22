@@ -1,0 +1,23 @@
+{
+  "_note": "Source of truth cho mapping campaign -> Hinh thuc | TKQC | Target. Thu tu trong 'rules' = thu tu dong trong Google Sheet moi ngay. Them rule moi thi cap nhat ca bang trong parts/qh/PART.md.",
+  "columns": ["ngay", "week", "hinh_thuc", "tkqc", "target", "chi_phi", "impression", "click"],
+  "default_metrics": ["chi_phi", "impression", "click"],
+  "fill_all_rows": false,
+  "rules": [
+    { "key": "ASC_LAL.Reweb_Terms",              "hinh_thuc": "Conversion", "tkqc": "Facebook", "target": "LAL MKT" },
+    { "key": "lead_title",                       "hinh_thuc": "Conversion", "tkqc": "Facebook", "target": "FB Title IR" },
+    { "key": "ReMKT_ASC",                        "hinh_thuc": "Conversion", "tkqc": "Facebook", "target": "Re MKT (ASC)" },
+    { "key": "Lead_ASC.CountryGroups_LAL.Reweb", "hinh_thuc": "Conversion", "tkqc": "Facebook", "target": "LKL MKT Countries" },
+    { "key": "_ReMKT_CountryGroups.ASC",         "hinh_thuc": "Conversion", "tkqc": "Facebook", "target": "ReMKT ASC Countries" },
+    { "key": "Search_Brand_South",               "hinh_thuc": "Conversion", "tkqc": "Google",   "target": "Google SEM.SDA" },
+    { "key": "SEM - General",                    "hinh_thuc": "Conversion", "tkqc": "Google",   "target": "Google SEM.SDA" },
+    { "key": "Search_Dynamic_South_V2",          "hinh_thuc": "Conversion", "tkqc": "Google",   "target": "Google SEM.SDA.02" },
+    { "key": "SEM - SDA.02",                     "hinh_thuc": "Conversion", "tkqc": "Google",   "target": "Google SEM.SDA.02" }
+  ],
+  "colors": {
+    "_note": "Mau chip dropdown trong sheet (nen / chu).",
+    "Conversion": { "bg": "#B10202", "text": "#FFCFC9", "desc": "đỏ đậm, chữ trắng hồng" },
+    "Facebook":   { "bg": "#BFE1F6", "text": "#0A53A8", "desc": "xanh dương nhạt, chữ xanh dương" },
+    "Google":     { "bg": "#D4EDBC", "text": "#11734B", "desc": "xanh lá nhạt, chữ xanh lá" }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "_note": "Source of truth cho mapping part DND. Thu tu 'rules' = thu tu dong trong Google Sheet moi ngay. 'all' = ten campaign phai chua TAT CA chuoi (khong phan biet hoa thuong); all=[] = moi campaign cua nguon do. 'optional' = chi xuat dong khi co so lieu. Them/sua rule thi cap nhat ca bang trong parts/dnd/PART.md.",
+  "columns": ["date_mdy", "hinh_thuc", "tkqc", "chi_phi", "reach", "impression", "click", "tin_nhan"],
+  "labels": { "date_mdy": "Date", "chi_phi": "Total Cost" },
+  "default_metrics": ["chi_phi", "reach", "impression", "tin_nhan"],
+  "fill_all_rows": true,
+  "rules": [
+    { "source": "facebook", "account": "1917832182458596", "all": ["Branding_", "_DND2A_"],  "hinh_thuc": "Branding",          "tkqc": "DND Sài Gòn 02",
+      "metrics": ["chi_phi", "reach", "impression"],
+      "redirect": { "tin_nhan": { "hinh_thuc": "Message - Khúc Xạ", "tkqc": "DND Sài Gòn" } } },
+    { "source": "facebook", "account": "1465106504558065", "all": ["PFM_KXLT_", "_DNDA_"],   "hinh_thuc": "Message - Lão Thị", "tkqc": "DND Sài Gòn" },
+    { "source": "facebook", "account": "1465106504558065", "all": ["PFM_PTKX_", "_DNDA_"],   "hinh_thuc": "Message - Khúc Xạ", "tkqc": "DND Sài Gòn" },
+    { "source": "facebook", "account": "1465106504558065", "all": ["PFM_Phaco_", "_DNDA_"],  "hinh_thuc": "Message - Phaco",   "tkqc": "DND Sài Gòn" },
+    { "source": "facebook", "account": "1465106504558065", "all": ["PFM_KXTE_", "_DNDA_"],   "hinh_thuc": "Message - Kid",     "tkqc": "DND Sài Gòn" },
+    { "source": "facebook", "account": "553260191728855",  "all": ["Event_", "_EV.CVS_"],    "hinh_thuc": "Event - CVS",       "tkqc": "Agency", "optional": true },
+    { "source": "facebook", "account": "553260191728855",  "all": ["Event_", "_EV.Live."],   "hinh_thuc": "Event - Live",      "tkqc": "Agency", "optional": true },
+    { "source": "google",   "all": [],                                                       "hinh_thuc": "Google Search - Khúc Xạ", "tkqc": "DND Sài Gòn",
+      "metrics": ["chi_phi", "reach", "impression", "click"],
+      "copy": { "reach": "impression" } },
+    { "source": "tiktok",   "all": ["Branding_", "_Tiktok_"],                                "hinh_thuc": "Tiktok - Branding", "tkqc": "DND Sài Gòn" },
+    { "source": "tiktok",   "all": ["PFM_Mess_", "_Tiktok_"],                                "hinh_thuc": "Tiktok - Message",  "tkqc": "DND Sài Gòn" }
+  ],
+  "colors": {
+    "_note": "Mau chip dropdown trong sheet (nen / chu), lay tu anh sheet mau. Event/Agency chua co.",
+    "Branding":                { "bg": "#0A53A8", "text": "#BFE1F6", "desc": "xanh dương đậm, chữ xanh nhạt" },
+    "Message - *":             { "bg": "#0A53A8", "text": "#BFE1F6", "desc": "xanh dương đậm, chữ xanh nhạt" },
+    "Google Search - Khúc Xạ": { "bg": "#11734B", "text": "#D4EDBC", "desc": "xanh lá đậm, chữ xanh lá nhạt" },
+    "Tiktok - *":              { "bg": "#3D3D3D", "text": "#E6E6E6", "desc": "xám đen, chữ xám nhạt" },
+    "DND Sài Gòn 02":          { "bg": "#BFE1F6", "text": "#0A53A8", "desc": "xanh dương nhạt, chữ xanh dương" },
+    "DND Sài Gòn":             { "bg": "#D4EDBC", "text": "#11734B", "desc": "xanh lá nhạt, chữ xanh lá" }
+  }
+}
