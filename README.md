@@ -13,6 +13,7 @@ hoặc ảnh), map tên campaign theo bảng chuẩn của từng **part** (QH, 
 |---|---|
 | `/reports qh` + file/ảnh | Báo cáo part QH (lệnh cũ `/report-qh` vẫn hiểu là QH) |
 | `/reports dnd` + file/ảnh | Báo cáo part DND |
+| `/reports hlw` + file/ảnh | Báo cáo part HLW (HelianWell) |
 | `/reports` | Tự đoán part từ tên campaign, không đoán được thì hỏi |
 
 Nguồn nào không gửi thì bỏ qua. Ảnh không thấy ngày thì skill hỏi 1 câu.

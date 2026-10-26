@@ -3,10 +3,10 @@ inclusion: manual
 name: reports
 description: >
   Lọc báo cáo Chi phí | Reach | Impression | Click | Tin nhắn từ file/ảnh Facebook Ads, Google Ads,
-  TikTok Ads, GPT Ads, map tên campaign theo bảng chuẩn của từng PART (QH, DND, ...), rồi tạo PROMPT
+  TikTok Ads, GPT Ads, map tên campaign theo bảng chuẩn của từng PART (QH, DND, HLW, ...), rồi tạo PROMPT
   để dán vào Gemini trong Google Sheets tự điền số liệu vào sheet. Thiếu nguồn nào thì bỏ qua.
-  Trigger: "/reports qh", "/reports dnd", "/reports", "/report-qh" (= part qh), "report qh",
-  "report dnd", "lọc chi phí impression click", "tạo prompt gemini sheet".
+  Trigger: "/reports qh", "/reports dnd", "/reports hlw", "/reports", "/report-qh" (= part qh), "report qh",
+  "report dnd", "report hlw", "lọc chi phí impression click", "tạo prompt gemini sheet".
 ---
 
 # /reports — Chi phí · Reach · Impression · Click · Tin nhắn → Prompt Gemini Google Sheets
@@ -17,10 +17,11 @@ description: >
 |---|---|---|
 | `/reports qh` (hoặc `/report-qh` cũ) | QH | [parts/qh/PART.md](parts/qh/PART.md) + [parts/qh/mapping.json](parts/qh/mapping.json) |
 | `/reports dnd` | DND | [parts/dnd/PART.md](parts/dnd/PART.md) + [parts/dnd/mapping.json](parts/dnd/mapping.json) |
+| `/reports hlw` | HLW (HelianWell) | [parts/hlw/PART.md](parts/hlw/PART.md) + [parts/hlw/mapping.json](parts/hlw/mapping.json) |
 
 - Part lấy từ chữ ngay sau `/reports` (không phân biệt hoa thường).
-- Không ghi part → suy ra từ tên campaign trong dữ liệu (vd chứa `QHD` → QH); không suy ra được → hỏi
-  **1 câu**: "Báo cáo này của part nào (QH / DND)?"
+- Không ghi part → suy ra từ tên campaign trong dữ liệu (vd chứa `QHD` → QH, `DND` → DND, `HelianWell` → HLW); không suy ra được → hỏi
+  **1 câu**: "Báo cáo này của part nào (QH / DND / HLW)?"
 - **Luôn đọc `parts/<part>/PART.md` trước khi xử lý** — file đó chứa: bảng mapping, cấu trúc sheet đích,
   màu chip, prompt Gemini mẫu. Mọi thứ trong PART.md **ưu tiên hơn** phần chung bên dưới.
 - Part có PART.md ở trạng thái `CHƯA CẤU HÌNH` → làm theo mục "Onboarding part mới" trong file đó.

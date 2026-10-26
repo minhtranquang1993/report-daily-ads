@@ -18,6 +18,7 @@
       "metrics": ["chi_phi", "reach", "impression", "click"],
       "copy": { "reach": "impression" } },
     { "source": "tiktok",   "all": ["Branding_", "_Tiktok_"],                                "hinh_thuc": "Tiktok - Branding", "tkqc": "DND Sài Gòn" },
+    { "source": "tiktok",   "all": ["Branding_", "_TTA_"],                                   "hinh_thuc": "Tiktok - Branding", "tkqc": "DND Sài Gòn" },
     { "source": "tiktok",   "all": ["PFM_Mess_", "_Tiktok_"],                                "hinh_thuc": "Tiktok - Message",  "tkqc": "DND Sài Gòn" }
   ],
   "colors": {

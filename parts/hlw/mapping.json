@@ -1,0 +1,12 @@
+{
+  "_note": "Source of truth cho mapping part HLW (HelianWell). Chi xuat dong co so lieu (fill_all_rows = false). Them rule moi thi cap nhat ca bang trong parts/hlw/PART.md.",
+  "columns": ["ngay", "week", "hinh_thuc", "tkqc", "target", "chi_phi", "reach", "impression", "click", "ket_qua"],
+  "default_metrics": ["chi_phi", "reach", "impression", "click", "ket_qua"],
+  "fill_all_rows": false,
+  "rules": [
+    { "source": "facebook", "all": ["HelianWell", "Leadform", "ASC.Parents.S1"],   "hinh_thuc": "Leadform",   "tkqc": "Facebook", "target": "ASC.Parents.S1" },
+    { "source": "facebook", "all": ["HelianWell", "Conversion", "ASC.Parents.S1"], "hinh_thuc": "Conversion", "tkqc": "Facebook", "target": "ASC.Parents.S1" },
+    { "source": "facebook", "key": "HelianWell_Leadform",                          "hinh_thuc": "Leadform",   "tkqc": "Facebook", "target": "HelianWell" },
+    { "source": "facebook", "key": "HelianWell_Conversion",                        "hinh_thuc": "Conversion", "tkqc": "Facebook", "target": "HelianWell" }
+  ]
+}

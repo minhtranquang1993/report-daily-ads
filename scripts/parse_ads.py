@@ -42,11 +42,11 @@ HERE = Path(__file__).resolve().parent.parent
 PARTS_DIR = HERE / "parts"
 
 WEEKDAYS_VI = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"]
-METRICS = ["chi_phi", "reach", "impression", "click", "tin_nhan"]
+METRICS = ["chi_phi", "reach", "impression", "click", "tin_nhan", "ket_qua"]
 LABELS = {
     "ngay": "Ngày", "week": "Week", "hinh_thuc": "Hình thức", "tkqc": "TKQC", "target": "Target",
     "chi_phi": "Chi phí", "reach": "Reach", "impression": "Impression", "click": "Click",
-    "tin_nhan": "Tin nhắn (Message)",
+    "tin_nhan": "Tin nhắn (Message)", "ket_qua": "Kết quả",
     "month": "Month", "iso_week": "Week No", "year": "Year", "date_mdy": "Date (mm/dd/yyyy)", "thu": "Thứ",
 }
 
@@ -61,16 +61,16 @@ def norm(s) -> str:
 
 # Ten cot (da norm) — uu tien theo thu tu trong list. Dung chung cho FB / Google / TikTok (EN + VI).
 COLS = {
-    "campaign": ["campaign name", "ten chien dich", "chien dich", "campaign"],
+    "campaign": ["campaign name", "ten chien dich", "chien dich", "campaign", "id chien dich", "campaign id"],
     "adset": ["ad set name", "ten nhom quang cao", "nhom quang cao", "ad set", "ad group name", "ad group"],
     "ad": ["ad name", "ten quang cao", "quang cao"],
     "account": ["account id", "id tai khoan", "advertiser id", "id nha quang cao", "customer id", "id khach hang"],
     "day": ["day", "ngay", "date", "by day", "theo ngay"],
-    "start": ["reporting starts", "bat dau bao cao"],
-    "end": ["reporting ends", "ket thuc bao cao"],
-    "currency": ["currency code", "currency", "ma tien te", "don vi tien te", "tien te"],
+    "start": ["reporting starts", "bat dau bao cao", "luot bat dau bao cao"],
+    "end": ["reporting ends", "ket thuc bao cao", "luot ket thuc bao cao"],
+    "currency": ["currency code", "currency", "ma don vi tien te", "ma tien te", "don vi tien te", "tien te"],
     "spend": ["amount spent (vnd)", "so tien da chi tieu (vnd)", "amount spent", "so tien da chi tieu",
-              "chi phi", "cost", "spend", "total cost", "tong chi phi"],
+              "chi tieu", "chi phi", "cost", "spend", "total cost", "tong chi phi"],
     "reach": ["reach", "nguoi tiep can", "luot tiep can", "pham vi tiep can", "tiep can"],
     "impr": ["impressions", "luot hien thi", "so lan hien thi", "lan hien thi", "so luot hien thi",
              "impr.", "impression", "hien thi"],
@@ -80,10 +80,13 @@ COLS = {
     "click_inter": ["interactions", "luot tuong tac", "so luot tuong tac"],
     "msg": ["messaging conversations started", "luot bat dau cuoc tro chuyen qua tin nhan",
             "cuoc tro chuyen qua tin nhan da bat dau", "so cuoc tro chuyen qua tin nhan da bat dau",
+            "cuoc tro chuyen (tin nhan truc tiep tren tiktok)",
             "conversations", "cuoc tro chuyen", "so cuoc tro chuyen", "tin nhan"],
+    "results": ["results", "ket qua", "leads", "khach hang tiem nang", "on-facebook leads"],
 }
 NAME_ALIASES = set(COLS["campaign"])
 TOTAL_RE = re.compile(r"^(tong|total)(\b|:)")
+COST_PER_RE = re.compile(r"\b(per|moi|tren moi|cho moi|cpa|cpc|cpm|cpl)\b")
 
 
 def find_col(columns, key):
@@ -91,10 +94,10 @@ def find_col(columns, key):
     for cand in COLS[key]:
         if cand in normed:
             return normed[cand]
-    # fallback: startswith (vd "Amount spent (USD)")
+    # fallback: startswith (vd "Amount spent (USD)"), tranh nham "Chi phi cho moi..."
     for cand in COLS[key]:
         for n, orig in normed.items():
-            if n.startswith(cand):
+            if n.startswith(cand) and not (key == "spend" and COST_PER_RE.search(n)):
                 return orig
     return None
 
@@ -116,7 +119,11 @@ def read_any(path: Path) -> pd.DataFrame:
             if any(norm(c) in NAME_ALIASES for c in raw.iloc[i].tolist() if isinstance(c, str)):
                 df = raw.iloc[i + 1:].copy()
                 df.columns = [str(c) for c in raw.iloc[i].tolist()]
-                return df.reset_index(drop=True)
+                df = df.reset_index(drop=True)
+                df.attrs["preamble"] = [
+                    " ".join(str(x) for x in raw.iloc[r].tolist() if pd.notna(x)) for r in range(i)
+                ]
+                return df
         return pd.read_excel(path)
     last_err = None
     for enc in ("utf-8-sig", "utf-16", "cp1258", "latin-1"):
@@ -130,7 +137,9 @@ def read_any(path: Path) -> pd.DataFrame:
         if idx is None:
             last_err = f"khong thay dong header (encoding {enc})"
             continue
-        return pd.read_csv(io.StringIO("\n".join(lines[idx:])), sep=delim, dtype=str, engine="python")
+        df = pd.read_csv(io.StringIO("\n".join(lines[idx:])), sep=delim, dtype=str, engine="python")
+        df.attrs["preamble"] = lines[:idx]
+        return df
     raise RuntimeError(f"Khong doc duoc file {path}: {last_err}")
 
 
@@ -266,7 +275,7 @@ def process_file(src, path, cfg, a, forced, st):
     else:
         click_col = cols["click_all"] or cols["click_inter"] or cols["click_link"]
     metric_col = {"chi_phi": cols["spend"], "reach": cols["reach"], "impression": cols["impr"],
-                  "click": click_col, "tin_nhan": cols["msg"]}
+                  "click": click_col, "tin_nhan": cols["msg"], "ket_qua": cols["results"]}
 
     rules = [r for r in cfg["rules"] if r.get("source") in (None, src)]
     rules.sort(key=lambda r: (len(rule_keys(r)) > 0, sum(len(k) for k in rule_keys(r))), reverse=True)
@@ -281,6 +290,7 @@ def process_file(src, path, cfg, a, forced, st):
         if not metric_col.get(m):
             st["warnings"].append(f"{tag} Thieu cot '{LABELS[m]}' -> chi so nay se de TRONG.")
 
+    preamble_date = None
     if not forced and not cols["day"]:
         if cols["start"] and cols["end"]:
             s = df[cols["start"]].dropna().map(parse_date).unique()
@@ -288,7 +298,19 @@ def process_file(src, path, cfg, a, forced, st):
             if len(s) == 1 and len(e) == 1 and s[0] != e[0]:
                 st["warnings"].append(f"{tag} File la tong khoang {s[0]} -> {e[0]}, KHONG tach theo ngay. Hoi user ngay hoac export lai theo Day.")
         elif not cols["start"]:
-            st["warnings"].append(f"{tag} File khong co cot ngay — can hoi user ngay bao cao (dung --date).")
+            for pline in df.attrs.get("preamble", []):
+                clean_line = pline.strip().strip('"').strip("'")
+                parts = re.split(r"\s*[-–—]\s*", clean_line)
+                if len(parts) == 2:
+                    d1, d2 = parse_date(parts[0]), parse_date(parts[1])
+                    if d1 and d2:
+                        if d1 == d2:
+                            preamble_date = d1
+                        else:
+                            st["warnings"].append(f"{tag} File la tong khoang {d1} -> {d2}, KHONG tach theo ngay. Hoi user ngay hoac export lai theo Day.")
+                        break
+            if not preamble_date:
+                st["warnings"].append(f"{tag} File khong co cot ngay — can hoi user ngay bao cao (dung --date).")
 
     currency = "?"
     cur = re.search(r"\(([A-Za-z]{3})\)", str(cols["spend"]))
@@ -317,7 +339,7 @@ def process_file(src, path, cfg, a, forced, st):
         elif cols["start"]:
             d = parse_date(row[cols["start"]])
         else:
-            d = None
+            d = preamble_date
         st["dates"].add(d)
         vals = {m: to_num(row[c]) for m, c in metric_col.items() if c}
         if rule is None:

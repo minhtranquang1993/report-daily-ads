@@ -21,7 +21,7 @@ tự dòng trong sheet mỗi ngày (đúng như sheet thật). Hình thức / TK
 | 6 | Facebook | 553260191728855 | `Event_` + `_EV.CVS_` | Event - CVS | Agency | Total Cost · Reach · Impression · Tin nhắn — *chỉ xuất khi có số liệu* |
 | 7 | Facebook | 553260191728855 | `Event_` + `_EV.Live.` | Event - Live | Agency | Total Cost · Reach · Impression · Tin nhắn — *chỉ xuất khi có số liệu* |
 | 8 | Google | — | *(mọi campaign, cộng hết thành 1 dòng)* | Google Search - Khúc Xạ | DND Sài Gòn | Total Cost · Reach (= Impression) · Impression · Click |
-| 9 | TikTok | — | `Branding_` + `_Tiktok_` | Tiktok - Branding | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn |
+| 9 | TikTok | — | `Branding_` + (`_Tiktok_` hoặc `_TTA_`) | Tiktok - Branding | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn |
 | 10 | TikTok | — | `PFM_Mess_` + `_Tiktok_` | Tiktok - Message | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn |
 
 Quy tắc riêng từng nguồn:
