@@ -18,11 +18,13 @@ tự dòng trong sheet mỗi ngày (đúng như sheet thật). Hình thức / TK
 | 3 | Facebook | 1465106504558065 | `PFM_PTKX_` + `_DNDA_` | Message - Khúc Xạ | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn (+ tin nhắn Branding) |
 | 4 | Facebook | 1465106504558065 | `PFM_Phaco_` + `_DNDA_` | Message - Phaco | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn |
 | 5 | Facebook | 1465106504558065 | `PFM_KXTE_` + `_DNDA_` | Message - Kid | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn |
-| 6 | Facebook | 553260191728855 | `Event_` + `_EV.CVS_` | Event - CVS | Agency | Total Cost · Reach · Impression · Tin nhắn — *chỉ xuất khi có số liệu* |
-| 7 | Facebook | 553260191728855 | `Event_` + `_EV.Live.` | Event - Live | Agency | Total Cost · Reach · Impression · Tin nhắn — *chỉ xuất khi có số liệu* |
-| 8 | Google | — | *(mọi campaign, cộng hết thành 1 dòng)* | Google Search - Khúc Xạ | DND Sài Gòn | Total Cost · Reach (= Impression) · Impression · Click |
-| 9 | TikTok | — | `Branding_` + (`_Tiktok_` hoặc `_TTA_`) | Tiktok - Branding | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn |
-| 10 | TikTok | — | `PFM_Mess_` + `_Tiktok_` | Tiktok - Message | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn |
+| 6 | Facebook | 553260191728855 | `PFM_PTKX_` + `_CVA_MS_` | Message - Khúc Xạ | Agency | Total Cost · Reach · Impression · Tin nhắn |
+| 7 | Facebook | 553260191728855 | `Event_` + `_EV.CVS_` | Event - CVS | Agency | Total Cost · Reach · Impression · Tin nhắn — *chỉ xuất khi có số liệu* |
+| 8 | Facebook | 553260191728855 | `Event_` + `_EV.Live.` | Event - Live | Agency | Total Cost · Reach · Impression · Tin nhắn — *chỉ xuất khi có số liệu* |
+| 9 | Google | — | *(mọi campaign, cộng hết thành 1 dòng)* | Google Search - Khúc Xạ | DND Sài Gòn | Total Cost · Reach (= Impression) · Impression · Click |
+| 10 | TikTok | — | `Branding_` + (`_Tiktok_` hoặc `_TTA_`) | Tiktok - Branding | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn |
+| 11 | TikTok | — | `PFM_Mess_` + `_Tiktok_` hoặc `PPFM_Tiktok_Mess` / `PFM_Tiktok_Mess` | Tiktok - Message | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn |
+| 12 | TikTok | — | `PFM_Conversion_Tiktok` | Tiktok - Conversion | DND Sài Gòn | Total Cost · Reach · Impression · Tin nhắn |
 
 Quy tắc riêng từng nguồn:
 - **Facebook**: Tin nhắn = cột "Lượt bắt đầu cuộc trò chuyện qua tin nhắn" (Messaging conversations started).
@@ -70,7 +72,7 @@ Thứ tự cột từ trái sang phải:
 |---|---|---|---|
 | Hình thức | Branding, Message - Lão Thị / Khúc Xạ / Phaco / Kid | `#0A53A8` xanh dương đậm | `#BFE1F6` xanh nhạt |
 | Hình thức | Google Search - Khúc Xạ | `#11734B` xanh lá đậm | `#D4EDBC` xanh lá nhạt |
-| Hình thức | Tiktok - Branding, Tiktok - Message | `#3D3D3D` xám đen | `#E6E6E6` xám nhạt |
+| Hình thức | Tiktok - Branding, Tiktok - Message, Tiktok - Conversion | `#3D3D3D` xám đen | `#E6E6E6` xám nhạt |
 | TKQC | DND Sài Gòn 02 | `#BFE1F6` xanh dương nhạt | `#0A53A8` xanh dương |
 | TKQC | DND Sài Gòn | `#D4EDBC` xanh lá nhạt | `#11734B` xanh lá |
 | Hình thức / TKQC | Event - CVS, Event - Live / Agency | *chưa có* — giữ màu sẵn có trong dropdown | |
@@ -101,7 +103,7 @@ CÁCH NHẬP (mỗi dòng dữ liệu = 1 dòng trong sheet):
 3. Ô TRỐNG trong dữ liệu (không có gì giữa 2 dấu |): vẫn tạo/giữ dòng đó, nhưng để TRỐNG ô tương ứng — không ghi 0, không ghi "-". Nếu dòng đã có sẵn và ô đó đang có giá trị thì GIỮ NGUYÊN, không xoá.
 4. Chỉ số ghi dạng SỐ thuần (không dấu phân cách hàng nghìn, không ký hiệu ₫). Total Cost đơn vị [VND/USD]; dấu chấm trong dữ liệu là dấu THẬP PHÂN.
 5. MÀU CHIP — kiểm tra và chỉnh lại màu cho TẤT CẢ các dòng vừa nhập/cập nhật:
-   - Hình thức: "Branding", "Message - Lão Thị", "Message - Khúc Xạ", "Message - Phaco", "Message - Kid" = nền xanh dương đậm #0A53A8, chữ xanh nhạt #BFE1F6; "Google Search - Khúc Xạ" = nền xanh lá đậm #11734B, chữ #D4EDBC; "Tiktok - Branding", "Tiktok - Message" = nền xám đen #3D3D3D, chữ #E6E6E6.
+   - Hình thức: "Branding", "Message - Lão Thị", "Message - Khúc Xạ", "Message - Phaco", "Message - Kid" = nền xanh dương đậm #0A53A8, chữ xanh nhạt #BFE1F6; "Google Search - Khúc Xạ" = nền xanh lá đậm #11734B, chữ #D4EDBC; "Tiktok - Branding", "Tiktok - Message", "Tiktok - Conversion" = nền xám đen #3D3D3D, chữ #E6E6E6.
    - TKQC: "DND Sài Gòn 02" = nền xanh dương nhạt #BFE1F6, chữ xanh dương #0A53A8; "DND Sài Gòn" = nền xanh lá nhạt #D4EDBC, chữ xanh lá #11734B.
    - Giá trị khác (vd Event - CVS, Agency): copy định dạng từ dòng có cùng giá trị.
    - Định dạng còn lại (viền, font, định dạng số ₫ của Total Cost) giống các dòng phía trên.

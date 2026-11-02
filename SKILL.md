@@ -57,6 +57,7 @@ Cấu hình cấp part trong `mapping.json`: `columns` (thứ tự cột output)
 - Nhiều ngày → tách theo từng ngày, sắp xếp tăng dần.
 
 ### Bước 2 — File (Facebook / Google / TikTok)
+> macOS / môi trường chưa cài `pandas` global: thay `python` bằng `uv run -q --with pandas --with openpyxl python3`.
 ```powershell
 python "<skill_dir>/scripts/parse_ads.py" "<fb.csv>" --part qh                      # file không kèm cờ = Facebook
 python "<skill_dir>/scripts/parse_ads.py" --part dnd --fb "<fb1>" --fb "<fb2>" --google "<gg.csv>" --tiktok "<tt.xlsx>"
