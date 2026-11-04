@@ -111,6 +111,10 @@ Cột nhập: Date (**mm/dd/yyyy**) · Hình thức · TKQC · Total Cost · Rea
 Month / Week / Year / Thứ / CPM / CPC / Cost per Message là **công thức trong sheet** → không nhập.
 Tin nhắn của Branding cộng sang Message - Khúc Xạ (chi phí/reach/impression Branding giữ riêng).
 Google gộp 1 dòng, Reach = Impression.
+**Lead Tổng / Đặt Lịch / XN tham gia / Đã Khám** tự lấy từ Supabase (`status_data` của repo data-ads) bằng
+`scripts/fetch_leads.py` (parse_ads tự gọi; cần `psycopg` → `uv run --with "psycopg[binary]"`). Kết nối: env
+`DATA_ADS_DB_URL`, hoặc repo data-ads (env `DATA_ADS_DIR` → thư mục hiện tại trở lên → `~/Downloads/data-ads`) có
+`supabase/.temp/pooler-url` + `.env.local`. Quy tắc đếm: mục "Lead từ Supabase" trong `parts/dnd/PART.md`.
 
 ## Đồng bộ nhiều nơi
 

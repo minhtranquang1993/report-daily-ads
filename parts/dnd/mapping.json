@@ -1,7 +1,25 @@
 {
   "_note": "Source of truth cho mapping part DND. Thu tu 'rules' = thu tu dong trong Google Sheet moi ngay. 'all' = ten campaign phai chua TAT CA chuoi (khong phan biet hoa thuong); all=[] = moi campaign cua nguon do. 'optional' = chi xuat dong khi co so lieu. Them/sua rule thi cap nhat ca bang trong parts/dnd/PART.md.",
-  "columns": ["date_mdy", "hinh_thuc", "tkqc", "chi_phi", "reach", "impression", "click", "tin_nhan"],
+  "columns": ["date_mdy", "hinh_thuc", "tkqc", "chi_phi", "reach", "impression", "click", "tin_nhan", "lead_tong", "dat_lich", "da_kham"],
   "labels": { "date_mdy": "Date", "chi_phi": "Total Cost" },
+  "leads": {
+    "_note": "Lead lay tu Supabase (status_data, project data-ads) boi scripts/fetch_leads.py — parse_ads.py tu goi khi part co muc nay. Dem SO DONG status_data. Ngay cat theo timezone. groups khop theo thu tu, group khong co loai_dich_vu = moi loai con lai cua nguon do. Sua thi cap nhat ca PART.md.",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "zero_as_blank": true,
+    "metrics": {
+      "lead_tong": { "date": "created_at", "statuses": null },
+      "dat_lich":  { "date": "updated_at", "statuses": ["dat_lich", "dat_lich_tai_kham", "xac_nhan_tham_gia", "da_kham", "da_tham_gia", "chot_don"] },
+      "da_kham":   { "date": "updated_at", "statuses": ["da_kham", "da_tham_gia", "chot_don"] }
+    },
+    "groups": [
+      { "nguon": ["Facebook"], "loai_dich_vu": ["phaco"],      "hinh_thuc": "Message - Phaco",          "tkqc": "DND Sài Gòn" },
+      { "nguon": ["Facebook"], "loai_dich_vu": ["kx_lao_thi"], "hinh_thuc": "Message - Lão Thị",        "tkqc": "DND Sài Gòn" },
+      { "nguon": ["Facebook"], "loai_dich_vu": ["ortho_k"],    "hinh_thuc": "Message - Kid",            "tkqc": "DND Sài Gòn" },
+      { "nguon": ["Facebook"],                                 "hinh_thuc": "Message - Khúc Xạ",        "tkqc": "DND Sài Gòn" },
+      { "nguon": ["Google"],                                   "hinh_thuc": "Google Search - Khúc Xạ",  "tkqc": "DND Sài Gòn" },
+      { "nguon": ["TikTok"],                                   "hinh_thuc": "Tiktok - Conversion",      "tkqc": "DND Sài Gòn" }
+    ]
+  },
   "default_metrics": ["chi_phi", "reach", "impression", "tin_nhan"],
   "fill_all_rows": true,
   "rules": [

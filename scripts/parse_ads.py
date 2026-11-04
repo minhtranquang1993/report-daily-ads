@@ -12,6 +12,7 @@ Options:
   --date    : DD/MM/YYYY — ep ngay cho toan bo file (file khong co cot Ngay / Day).
   --clicks  : (Facebook) link = Link clicks (mac dinh), all = Clicks (all).
   --json    : in JSON thay vi bang TSV.
+  --no-leads: (part co muc "leads") KHONG lay Lead/Dat lich/Da kham tu Supabase.
 
 Schema rule trong mapping.json:
   key | all     : 1 chuoi (key) hoac list chuoi (all) — ten campaign phai chua TAT CA. all=[] = bat moi campaign.
@@ -25,6 +26,8 @@ Schema rule trong mapping.json:
 Part-level: columns (thu tu cot output), labels (doi ten header), default_metrics, fill_all_rows
 (true = moi ngay du tat ca dong, khong co so lieu thi de trong).
 Cot ngay co the dung: ngay (dd/mm/yyyy), week (Thu), month, iso_week, year, date_mdy (mm/dd/yyyy), thu.
+Part co muc "leads" (vd DND): tu goi scripts/fetch_leads.py lay lead_tong / dat_lich / da_kham tu Supabase
+cho cac ngay co trong file ads (can psycopg: them `--with "psycopg[binary]"` khi chay qua uv).
 """
 import argparse
 import csv
@@ -48,7 +51,9 @@ LABELS = {
     "chi_phi": "Chi phí", "reach": "Reach", "impression": "Impression", "click": "Click",
     "tin_nhan": "Tin nhắn (Message)", "ket_qua": "Kết quả",
     "month": "Month", "iso_week": "Week No", "year": "Year", "date_mdy": "Date (mm/dd/yyyy)", "thu": "Thứ",
+    "lead_tong": "Lead Tổng", "dat_lich": "Đặt Lịch / XN tham gia", "da_kham": "Đã Khám",
 }
+LEAD_METRICS = ["lead_tong", "dat_lich", "da_kham"]
 
 
 def norm(s) -> str:
@@ -366,6 +371,7 @@ def main():
     ap.add_argument("--date", help="DD/MM/YYYY — ep ngay cho toan bo file")
     ap.add_argument("--clicks", choices=["link", "all"], default="link")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--no-leads", action="store_true", help="khong lay lead tu Supabase")
     a = ap.parse_args()
 
     cfg = load_part(a.part)
@@ -383,17 +389,36 @@ def main():
     order = cfg["_order"]
     if forced:
         st["dates"].add(forced)
+
+    # --- Lead / Dat lich / Da kham tu Supabase (part co muc "leads") ---
+    leads_cfg = cfg.get("leads")
+    leads, leads_info = {}, None
+    if leads_cfg and not a.no_leads:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import fetch_leads as fl  # noqa: PLC0415
+        for g in leads_cfg["groups"]:
+            if (g["hinh_thuc"], g["tkqc"], "") not in order:
+                sys.exit(f"mapping.json: leads.groups -> ({g['hinh_thuc']}, {g['tkqc']}) khong ton tai trong rules")
+        try:
+            leads = fl.fetch_leads(leads_cfg, [d for d in st["dates"] if d])
+            leads_info = f"Supabase status_data | tz {leads_cfg.get('timezone', 'Asia/Ho_Chi_Minh')} | 0 -> " \
+                         + ("trong" if leads_cfg.get("zero_as_blank") else "0")
+        except fl.LeadsError as e:
+            st["warnings"].append(f"KHONG lay duoc lead tu Supabase ({e}) -> cot Lead/Dat lich/Da kham de TRONG.")
+    lead_nonzero = {k for k, v in leads.items() if any(v.values())}
+
     if cfg["fill_all_rows"]:
         dates = sorted(st["dates"], key=lambda d: (d is None, str(d)))
         rids = sorted(order, key=order.get)
         optional = {rid(r) for r in cfg["rules"] if r.get("optional")}
-        keys = [(d, r) for d in dates for r in rids if r not in optional or (d, r) in st["agg"]]
+        keys = [(d, r) for d in dates for r in rids
+                if r not in optional or (d, r) in st["agg"] or (d, r) in lead_nonzero]
         sources = {s for s, _ in jobs}
         missing = sorted({r.get("source") for r in cfg["rules"] if r.get("source")} - sources)
         if missing:
             st["warnings"].append(f"Khong co file nguon: {missing} -> cac dong nguon nay de TRONG.")
     else:
-        keys = sorted(st["agg"], key=lambda k: (str(k[0]), order[k[1]]))
+        keys = sorted(set(st["agg"]) | lead_nonzero, key=lambda k: (str(k[0]), order[k[1]]))
 
     out = []
     for d, r in keys:
@@ -405,12 +430,16 @@ def main():
                "hinh_thuc": r[0], "tkqc": r[1], "target": r[2]}
         for m in METRICS:
             row[m] = fmt_val(m, g.get(m))
+        lv = leads.get((d, r), {})
+        for m in LEAD_METRICS:
+            row[m] = fl.fmt_count(leads_cfg, lv.get(m)) if lv else ""
         out.append(row)
 
     meta = {
         "part": a.part,
         "columns": cfg["columns"],
         "files": st["files"],
+        "leads": leads_info,
         "warnings": st["warnings"],
         "unmapped": [
             {"source": k[0], "ngay": k[1], "name": k[2], **{m: fmt_val(m, v) for m, v in u.items()}}
@@ -427,6 +456,8 @@ def main():
     for r in out:
         print("\t".join(str(r[c]) for c in cfg["columns"]))
     print("\n# part:", a.part)
+    if leads_info:
+        print("# leads:", leads_info)
     for f in st["files"]:
         print(f"# file: [{f['source']}] {f['file']} | currency: {f['currency']} | columns_used: "
               + json.dumps(f["columns_used"], ensure_ascii=False))

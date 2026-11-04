@@ -5,6 +5,7 @@ description: >
   Lọc báo cáo Chi phí | Reach | Impression | Click | Tin nhắn từ file/ảnh Facebook Ads, Google Ads,
   TikTok Ads, GPT Ads, map tên campaign theo bảng chuẩn của từng PART (QH, DND, HLW, ...), rồi tạo PROMPT
   để dán vào Gemini trong Google Sheets tự điền số liệu vào sheet. Thiếu nguồn nào thì bỏ qua.
+  Part DND còn tự lấy Lead Tổng / Đặt lịch / Đã khám từ Supabase (data-ads) đưa vào cùng prompt.
   Trigger: "/reports qh", "/reports dnd", "/reports hlw", "/reports", "/report-qh" (= part qh), "report qh",
   "report dnd", "report hlw", "lọc chi phí impression click", "tạo prompt gemini sheet".
 ---
@@ -57,7 +58,8 @@ Cấu hình cấp part trong `mapping.json`: `columns` (thứ tự cột output)
 - Nhiều ngày → tách theo từng ngày, sắp xếp tăng dần.
 
 ### Bước 2 — File (Facebook / Google / TikTok)
-> macOS / môi trường chưa cài `pandas` global: thay `python` bằng `uv run -q --with pandas --with openpyxl python3`.
+> macOS / môi trường chưa cài `pandas` global: thay `python` bằng `uv run -q --with pandas --with openpyxl python3`
+> (part có lead từ Supabase như DND: thêm `--with "psycopg[binary]"`).
 ```powershell
 python "<skill_dir>/scripts/parse_ads.py" "<fb.csv>" --part qh                      # file không kèm cờ = Facebook
 python "<skill_dir>/scripts/parse_ads.py" --part dnd --fb "<fb1>" --fb "<fb2>" --google "<gg.csv>" --tiktok "<tt.xlsx>"
@@ -70,6 +72,13 @@ python "<skill_dir>/scripts/parse_ads.py" "<fb.csv>" --part qh --clicks all     
 - Có `WARNING` file là tổng khoảng nhiều ngày → báo user, đề nghị export lại breakdown theo **Day**.
 - `WARNING` thiếu cột → chỉ số đó để trống; báo user cột nào thiếu.
 - Không chạy được script → tự đọc file, áp dụng đúng quy tắc mapping của part.
+
+### Bước 2b — Lead từ Supabase (chỉ part có mục `leads` trong `mapping.json`, hiện là DND)
+- `parse_ads.py` **tự** lấy Lead Tổng / Đặt lịch / Đã khám cho đúng các ngày có trong file ads (dòng `# leads:`).
+- Ads đọc từ ảnh → chạy riêng `scripts/fetch_leads.py --part <part> --date DD/MM/YYYY` rồi ghép theo
+  Date + Hình thức + TKQC. Không có file/ảnh ads → hỏi ngày.
+- `WARNING: KHONG lay duoc lead` → 3 cột lead để trống, báo user lý do. **Không tự đếm/đoán số lead.**
+- Quy tắc đếm + gán dòng: xem mục "Lead từ Supabase" trong `PART.md` của part.
 
 ### Bước 3 — Google / GPT Ads (ảnh)
 - Đọc từng dòng campaign: Cost, Impr., Clicks. Bỏ dòng Total/Tổng.
