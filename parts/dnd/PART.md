@@ -47,10 +47,10 @@ Quy tắc riêng từng nguồn:
 
 ## Luôn đủ dòng (khác QH)
 
-- Mỗi ngày **luôn xuất đủ 8 dòng cố định** (#1–5, #8–10), kể cả khi không có số liệu / không gửi file nguồn đó
+- Mỗi ngày **luôn xuất đủ 10 dòng cố định** (#1–6, #9–12), kể cả khi không có số liệu / không gửi file nguồn đó
   → vẫn ghi Date, Hình thức, TKQC; các ô chỉ số **để trống** (không ghi 0, không ghi `-`).
-- Event - CVS / Event - Live (#6, #7) **không cố định** — chỉ thêm khi file có campaign Event ngày đó,
-  chèn sau Message - Kid. Không có thì bỏ, không tạo dòng trống.
+- Event - CVS / Event - Live (#7, #8) **không cố định** — chỉ thêm khi file có campaign Event ngày đó,
+  chèn sau Message - Khúc Xạ (Agency). Không có thì bỏ, không tạo dòng trống.
 - Campaign có xuất hiện nhưng số = 0 → ghi `0`. Chỉ số không áp dụng cho dòng (vd Click của Facebook) → để trống.
 
 ## Lead từ Supabase (Lead Tổng · Đặt Lịch / XN tham gia · Đã Khám)
@@ -169,12 +169,13 @@ DỮ LIỆU (Date | Hình thức | TKQC | Total Cost | Reach | Impression | Clic
 
 | Sai | Đúng |
 |---|---|
-| Bỏ dòng không có số liệu | DND luôn đủ 8 dòng cố định/ngày, ô chỉ số để trống |
+| Bỏ dòng không có số liệu | DND luôn đủ 10 dòng cố định/ngày, ô chỉ số để trống |
 | Ghi tin nhắn Branding vào dòng Branding | Để trống, CHỈ tin nhắn cộng sang Message - Khúc Xạ |
 | Cộng cả Total Cost/Reach/Impression Branding vào Khúc Xạ | Chỉ cộng tin nhắn; các chỉ số khác giữ ở dòng Branding |
 | Google tách nhiều dòng theo campaign | Cộng hết thành 1 dòng "Google Search - Khúc Xạ" |
 | Google Reach để trống | Reach = Impression (cùng số hiển thị) |
 | `PFM_KXLT_` / `PFM_PTKX_` không có `_DNDA_` vẫn đưa vào | Phải chứa đủ cả 2 chuỗi; thiếu → ⚠️ Chưa map |
+| Gộp `PFM_PTKX_` + `_CVA_MS_` vào Khúc Xạ TKQC "DND Sài Gòn" | Đây là dòng riêng: Message - Khúc Xạ / **Agency** (tin nhắn Branding KHÔNG cộng vào dòng này) |
 | Ghi Date dạng dd/mm/yyyy | Sheet dùng mm/dd/yyyy (`10/20/2026`) |
 | Tự tính / nhập tay Month, Week, Year, Thứ | Cột công thức theo Date — chỉ nhập Date |
 | Nhập tay CPM / CPC / Cost per Message | Cột công thức — kéo công thức xuống |

@@ -38,8 +38,8 @@ reports/
 ## Chạy script tay (khi cần kiểm tra)
 
 ```powershell
-# QH — file Facebook
-python scripts/parse_ads.py "fb.csv" --part qh
+# QH — file Facebook + GPT Ads
+python scripts/parse_ads.py --part qh --fb "fb.csv" --gpt "gpt.csv"
 
 # DND — đủ 3 nguồn, nhiều file FB thì lặp --fb
 python scripts/parse_ads.py --part dnd --fb "fb_tk1.csv" --fb "fb_tk2.csv" --google "gg.csv" --tiktok "tt.xlsx"
@@ -62,6 +62,7 @@ Output cuối có các dòng `# WARNING` (thiếu cột, file gộp nhiều ngà
 | Facebook | Breakdown theo **Day** (Ngày). Cột: tên chiến dịch, số tiền đã chi tiêu, **người tiếp cận (Reach)**, lượt hiển thị, **lượt bắt đầu cuộc trò chuyện qua tin nhắn** (DND), link clicks (QH). Mỗi TK quảng cáo 1 file cũng được. Có thêm cột Account ID thì script kiểm tra luôn TK. |
 | Google Ads | Phân đoạn theo **Ngày**. Cột: chiến dịch, chi phí, số lần hiển thị, lượt nhấp. File có dòng tiêu đề / dòng "Tổng" ở đầu-cuối không sao, script tự bỏ. |
 | TikTok | Theo ngày. Cột: campaign name, cost, reach (phạm vi tiếp cận), impressions (lần hiển thị), conversations (cuộc trò chuyện). Dòng "Total of …" tự bỏ. |
+| GPT Ads | Theo ngày (`date`). Cột: `date`, `campaign_name`, `impressions` (Lượt hiển thị), `clicks` (Click), `spend` (Chi phí). |
 
 - File FB chỉ có "Bắt đầu/Kết thúc báo cáo" khác ngày nhau = **tổng nhiều ngày** → script cảnh báo, nên export lại theo Day.
 - Tiền VND ghi số nguyên; USD giữ 2 số lẻ (script tự nhận đơn vị từ header `(VND)`/`(USD)` hoặc cột mã tiền tệ).
@@ -105,8 +106,8 @@ Thứ tự `rules` = thứ tự dòng trong sheet. Rule cụ thể hơn (tổng 
 **QH** — chỉ xuất Target có số liệu. Cột: Ngày (dd/mm/yyyy) · Week (Thứ) · Hình thức · TKQC · Target · Chi phí ·
 Impression · Click.
 
-**DND** — mỗi ngày đủ 8 dòng cố định (Branding, Message Lão Thị / Khúc Xạ / Phaco / Kid, Google Search - Khúc Xạ,
-Tiktok Branding / Message), không có số thì để trống; Event - CVS / Event - Live chỉ thêm khi có số liệu.
+**DND** — mỗi ngày đủ 10 dòng cố định (Branding, Message Lão Thị / Khúc Xạ (DND Sài Gòn) / Khúc Xạ (Agency) /
+Phaco / Kid, Google Search - Khúc Xạ, Tiktok Branding / Message / Conversion), không có số thì để trống; Event - CVS / Event - Live chỉ thêm khi có số liệu.
 Cột nhập: Date (**mm/dd/yyyy**) · Hình thức · TKQC · Total Cost · Reach · Impression · Click · Tin nhắn.
 Month / Week / Year / Thứ / CPM / CPC / Cost per Message là **công thức trong sheet** → không nhập.
 Tin nhắn của Branding cộng sang Message - Khúc Xạ (chi phí/reach/impression Branding giữ riêng).

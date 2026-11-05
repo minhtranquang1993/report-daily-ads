@@ -12,7 +12,9 @@
     { "key": "Search_Brand_South",               "hinh_thuc": "Conversion", "tkqc": "Google",   "target": "Google SEM.SDA" },
     { "key": "SEM - General",                    "hinh_thuc": "Conversion", "tkqc": "Google",   "target": "Google SEM.SDA" },
     { "key": "Search_Dynamic_South_V2",          "hinh_thuc": "Conversion", "tkqc": "Google",   "target": "Google SEM.SDA.02" },
-    { "key": "SEM - SDA.02",                     "hinh_thuc": "Conversion", "tkqc": "Google",   "target": "Google SEM.SDA.02" }
+    { "key": "SEM - SDA.02",                     "hinh_thuc": "Conversion", "tkqc": "Google",   "target": "Google SEM.SDA.02" },
+    { "key": "Wholesalers&Distributors",         "hinh_thuc": "Conversion", "tkqc": "GPT",      "target": "GPT Ads Wholesale" },
+    { "key": "GPTAds",                           "hinh_thuc": "Conversion", "tkqc": "GPT",      "target": "GPT Ads Wholesale" }
   ],
   "colors": {
     "_note": "Mau chip dropdown trong sheet (nen / chu).",

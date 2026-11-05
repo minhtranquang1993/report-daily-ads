@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-parse_ads.py — Doc file export Facebook / Google / TikTok Ads (CSV/XLSX), map ten campaign
+parse_ads.py — Doc file export Facebook / Google / TikTok / GPT Ads (CSV/XLSX), map ten campaign
 theo parts/<part>/mapping.json, gop chi so theo (Ngay, dong sheet = Hinh thuc | TKQC | Target).
 
 Usage:
-  python parse_ads.py --part dnd --fb a.csv [--fb b.csv] [--google g.csv] [--tiktok t.xlsx]
+  python parse_ads.py --part dnd --fb a.csv [--fb b.csv] [--google g.csv] [--tiktok t.xlsx] [--gpt gpt.csv]
   python parse_ads.py <file_fb.csv> --part qh          # file khong kem co = Facebook
 
 Options:
@@ -16,7 +16,7 @@ Options:
 
 Schema rule trong mapping.json:
   key | all     : 1 chuoi (key) hoac list chuoi (all) — ten campaign phai chua TAT CA. all=[] = bat moi campaign.
-  source        : facebook | google | tiktok (bo trong = moi nguon).
+  source        : facebook | google | tiktok | gpt (bo trong = moi nguon).
   account       : (tuy chon) ID tai khoan — chi kiem tra neu file co cot Account ID.
   hinh_thuc, tkqc, target : gia tri dien vao sheet (target co the bo trong).
   metrics       : list chi so dien cho dong nay (mac dinh = default_metrics cua part).
@@ -64,12 +64,15 @@ def norm(s) -> str:
     return re.sub(r"\s+", " ", s).strip().lower()
 
 
-# Ten cot (da norm) — uu tien theo thu tu trong list. Dung chung cho FB / Google / TikTok (EN + VI).
+# Ten cot (da norm) — uu tien theo thu tu trong list. Dung chung cho FB / Google / TikTok / GPT (EN + VI).
 COLS = {
-    "campaign": ["campaign name", "ten chien dich", "chien dich", "campaign", "id chien dich", "campaign id"],
-    "adset": ["ad set name", "ten nhom quang cao", "nhom quang cao", "ad set", "ad group name", "ad group"],
-    "ad": ["ad name", "ten quang cao", "quang cao"],
-    "account": ["account id", "id tai khoan", "advertiser id", "id nha quang cao", "customer id", "id khach hang"],
+    "campaign": ["campaign name", "campaign_name", "ten chien dich", "chien dich", "campaign",
+                 "id chien dich", "campaign id", "campaign_id"],
+    "adset": ["ad set name", "ad_set_name", "ten nhom quang cao", "nhom quang cao", "ad set",
+              "ad group name", "ad_group_name", "ad group"],
+    "ad": ["ad name", "ad_name", "ten quang cao", "quang cao"],
+    "account": ["account id", "account_id", "id tai khoan", "advertiser id", "advertiser_id",
+                "id nha quang cao", "customer id", "customer_id", "id khach hang"],
     "day": ["day", "ngay", "date", "by day", "theo ngay"],
     "start": ["reporting starts", "bat dau bao cao", "luot bat dau bao cao"],
     "end": ["reporting ends", "ket thuc bao cao", "luot ket thuc bao cao"],
@@ -87,7 +90,7 @@ COLS = {
             "cuoc tro chuyen qua tin nhan da bat dau", "so cuoc tro chuyen qua tin nhan da bat dau",
             "cuoc tro chuyen (tin nhan truc tiep tren tiktok)",
             "conversations", "cuoc tro chuyen", "so cuoc tro chuyen", "tin nhan"],
-    "results": ["results", "ket qua", "leads", "khach hang tiem nang", "on-facebook leads"],
+    "results": ["results", "ket qua", "leads", "khach hang tiem nang", "on-facebook leads", "conversions"],
 }
 NAME_ALIASES = set(COLS["campaign"])
 TOTAL_RE = re.compile(r"^(tong|total)(\b|:)")
@@ -368,6 +371,7 @@ def main():
     ap.add_argument("--fb", action="append", default=[], help="file Facebook Ads")
     ap.add_argument("--google", action="append", default=[], help="file Google Ads")
     ap.add_argument("--tiktok", action="append", default=[], help="file TikTok Ads")
+    ap.add_argument("--gpt", action="append", default=[], help="file GPT Ads")
     ap.add_argument("--date", help="DD/MM/YYYY — ep ngay cho toan bo file")
     ap.add_argument("--clicks", choices=["link", "all"], default="link")
     ap.add_argument("--json", action="store_true")
@@ -376,9 +380,9 @@ def main():
 
     cfg = load_part(a.part)
     jobs = ([("facebook", f) for f in a.files + a.fb] + [("google", f) for f in a.google]
-            + [("tiktok", f) for f in a.tiktok])
+            + [("tiktok", f) for f in a.tiktok] + [("gpt", f) for f in a.gpt])
     if not jobs:
-        sys.exit("Can it nhat 1 file (--fb / --google / --tiktok).")
+        sys.exit("Can it nhat 1 file (--fb / --google / --tiktok / --gpt).")
     forced = datetime.strptime(a.date, "%d/%m/%Y").date() if a.date else None
     st = {"agg": {}, "unmapped": {}, "dates": set(), "warnings": [], "files": []}
     if not cfg["rules"]:

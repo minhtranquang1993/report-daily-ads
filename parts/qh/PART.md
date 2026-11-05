@@ -1,8 +1,8 @@
 # PART QH — `/reports qh`
 
 > Trạng thái: **ĐÃ CẤU HÌNH**. Workflow chung xem [../../SKILL.md](../../SKILL.md).
-> Chạy script: `python "<skill_dir>/scripts/parse_ads.py" "<file FB>" --part qh`
-> (Google / GPT Ads của QH thường là ảnh → đọc ảnh theo bảng mapping.)
+> Chạy script: `python "<skill_dir>/scripts/parse_ads.py" --part qh --fb "<file FB>" --gpt "<file GPT>"`
+> (Google / GPT Ads có thể gửi dạng file CSV/Excel hoặc ảnh chụp → file chạy script, ảnh đọc theo bảng mapping.)
 > Chỉ xuất dòng Target **có xuất hiện** trong dữ liệu (không tự thêm dòng trống).
 
 ## Bảng mapping (source of truth: [mapping.json](mapping.json))
@@ -18,17 +18,30 @@
 | `SEM - General` (vd `AK.QHD - SEM - General`) | Conversion | Google | Google SEM.SDA |
 | `Search_Dynamic_South_V2` | Conversion | Google | Google SEM.SDA.02 |
 | `SEM - SDA.02` (vd `AK.QHD - SEM - SDA.02`) | Conversion | Google | Google SEM.SDA.02 |
-| *(GPT Ads — chưa có mapping)* | ? | ? | ? |
+| `Wholesalers&Distributors` / `GPTAds` (vd `GPTAds_Lead_Wholesalers&Distributors`) | Conversion | GPT | GPT Ads Wholesale |
 
 > Thứ tự bảng = thứ tự dòng trong Google Sheet mỗi ngày. Target phải ghi **đúng chính tả** như trên
-> (vd `LKL MKT Countries`, `Re MKT (ASC)` có khoảng trắng, `ReMKT ASC Countries` không có).
+> (vd `LKL MKT Countries`, `Re MKT (ASC)` có khoảng trắng, `ReMKT ASC Countries` không có, `GPT Ads Wholesale`).
 > Thêm mapping mới → sửa **cả** `mapping.json` **và** bảng này.
+
+## Cấu trúc file GPT Ads (khi gửi file CSV/Excel)
+
+- Các cột trong file: `date,campaign_id,campaign_name,campaign_status,impressions,clicks,conversions,spend`.
+- Cách lấy chỉ số tương ứng cho báo cáo QH:
+  - `date` (`YYYY-MM-DD`) → đổi sang `Ngày` (`DD/MM/YYYY`) và suy ra `Week` (`Thứ Hai` … `Chủ Nhật`).
+  - `campaign_name` → khớp bảng mapping (vd `GPTAds_Lead_Wholesalers&Distributors` → `Conversion | GPT | GPT Ads Wholesale`).
+  - `spend` → **Chi phí** (nếu `spend = 0` vẫn ghi `0`).
+  - `impressions` → **Impression** (Lượt hiển thị).
+  - `clicks` → **Click**.
+  - Bỏ qua `campaign_id`, `campaign_status`, `conversions` (sheet QH không có cột này).
+  - File không có cột tiền tệ (script báo `currency: ?`) → dùng cùng đơn vị với các dòng Facebook/Google
+    của ngày đó; chưa rõ thì hỏi user **1 câu**.
 
 ## Cấu trúc sheet đích (từ ảnh mẫu)
 
 - Cột **D = Week** (`Thứ Hai` … `Chủ Nhật`), **E = Hình thức**, **F = TKQC**, **G = Target**.
 - Cột ngày nằm trước cột D; các cột Chi phí / Impression / Click nằm sau cột G → Gemini tự tìm theo tên header.
-- Mỗi ngày 1 block dòng (tối đa 7 dòng theo bảng mapping).
+- Mỗi ngày 1 block dòng (tối đa 8 dòng theo bảng mapping).
 - **Màu chip bắt buộc** (nguồn: `colors` trong `mapping.json`):
 
 | Cột | Giá trị | Nền | Chữ |
@@ -59,7 +72,7 @@ CÁCH NHẬP (mỗi dòng dữ liệu = 1 dòng trong sheet):
 4. Định dạng (dropdown, viền, font) của dòng mới phải giống các dòng phía trên. Các cột khác ngoài 8 trường trên: để trống hoặc kéo công thức xuống nếu cột đó là công thức.
 5. MÀU CHIP — kiểm tra và chỉnh lại màu cho TẤT CẢ các dòng vừa nhập/cập nhật:
    - Cột Hình thức (E): "Conversion" = nền đỏ đậm #B10202, chữ trắng hồng #FFCFC9.
-   - Cột TKQC (F): "Facebook" = nền xanh dương nhạt #BFE1F6, chữ xanh dương #0A53A8; "Google" = nền xanh lá nhạt #D4EDBC, chữ xanh lá #11734B.
+   - Cột TKQC (F): "Facebook" = nền xanh dương nhạt #BFE1F6, chữ xanh dương #0A53A8; "Google" = nền xanh lá nhạt #D4EDBC, chữ xanh lá #11734B; "GPT" = copy định dạng từ dòng GPT có sẵn phía trên (nếu chưa có thì giữ màu mặc định của dropdown).
    - Nếu chip chưa đúng màu, sửa màu của lựa chọn đó trong quy tắc dropdown (Xác thực dữ liệu) hoặc copy định dạng từ dòng phía trên có cùng giá trị.
 6. KHÔNG sửa, xoá dữ liệu của các dòng/ngày khác.
 7. Xong thì báo: số dòng đã cập nhật + số dòng đã thêm mới + dòng nào gặp lỗi (nếu có).
@@ -67,6 +80,7 @@ CÁCH NHẬP (mỗi dòng dữ liệu = 1 dòng trong sheet):
 DỮ LIỆU (Ngày | Week | Hình thức | TKQC | Target | Chi phí | Impression | Click):
 22/10/2026 | Thứ Năm | Conversion | Facebook | LAL MKT | 1250000 | 45210 | 380
 22/10/2026 | Thứ Năm | Conversion | Google | Google SEM.SDA | 830000 | 2100 | 145
+22/10/2026 | Thứ Năm | Conversion | GPT | GPT Ads Wholesale | 0 | 584 | 22
 ...
 ````
 
@@ -76,3 +90,4 @@ DỮ LIỆU (Ngày | Week | Hình thức | TKQC | Target | Chi phí | Impression
 |---|---|
 | `ReMKT_ASC` khớp nhầm với `_ReMKT_CountryGroups.ASC` | Key dài khớp trước; 2 key này khác nhau hoàn toàn |
 | Ghi Target sai chính tả (`LAL MKT Countries`) | Copy y nguyên từ bảng mapping (`LKL MKT Countries`) |
+| File GPT Ads lấy `conversions` làm Click | Click = cột `clicks`; Impression = `impressions`; Chi phí = `spend` |

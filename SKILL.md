@@ -21,7 +21,7 @@ description: >
 | `/reports hlw` | HLW (HelianWell) | [parts/hlw/PART.md](parts/hlw/PART.md) + [parts/hlw/mapping.json](parts/hlw/mapping.json) |
 
 - Part lấy từ chữ ngay sau `/reports` (không phân biệt hoa thường).
-- Không ghi part → suy ra từ tên campaign trong dữ liệu (vd chứa `QHD` → QH, `DND` → DND, `HelianWell` → HLW); không suy ra được → hỏi
+- Không ghi part → suy ra từ tên campaign trong dữ liệu (vd chứa `QHD` / `GPTAds` → QH, `DND` → DND, `HelianWell` → HLW); không suy ra được → hỏi
   **1 câu**: "Báo cáo này của part nào (QH / DND / HLW)?"
 - **Luôn đọc `parts/<part>/PART.md` trước khi xử lý** — file đó chứa: bảng mapping, cấu trúc sheet đích,
   màu chip, prompt Gemini mẫu. Mọi thứ trong PART.md **ưu tiên hơn** phần chung bên dưới.
@@ -34,13 +34,13 @@ description: >
 | Facebook Ads | File CSV / Excel (có thể nhiều file, mỗi TK 1 file) | `scripts/parse_ads.py --fb <file>` (xem bước 2) |
 | Google Ads | File CSV / Excel **hoặc** ảnh chụp bảng campaign | File → `--google <file>`; ảnh → đọc cột Campaign, Cost, Impr., Clicks |
 | TikTok Ads | File CSV / Excel hoặc ảnh | File → `--tiktok <file>`; ảnh → đọc tay |
-| GPT Ads | Ảnh chụp | Đọc ảnh: tên campaign, chi phí, impression, click |
+| GPT Ads | File CSV / Excel **hoặc** ảnh chụp | File → `--gpt <file>` (lấy `date`, `campaign_name`, `impressions` → Impression, `clicks` → Click, `spend` → Chi phí); ảnh → đọc tên campaign, chi phí, impression, click |
 
 ## Quy tắc khớp mapping (chung mọi part)
 
 Khớp theo **tên campaign** (không khớp thì thử ad set → ad), **không phân biệt hoa thường**.
 Rule dạng `key` = tên chứa chuỗi đó; dạng `all` = tên phải chứa **TẤT CẢ** chuỗi trong list (`all: []` = mọi
-campaign của nguồn đó). Rule có `source` chỉ áp cho nguồn đó (facebook / google / tiktok). Rule cụ thể hơn
+campaign của nguồn đó). Rule có `source` chỉ áp cho nguồn đó (facebook / google / tiktok / gpt). Rule cụ thể hơn
 (tổng độ dài chuỗi lớn hơn) khớp trước. Source of truth: `parts/<part>/mapping.json`.
 Thêm mapping mới → sửa **cả** `mapping.json` **và** bảng mapping trong `PART.md` của part đó.
 
@@ -53,15 +53,16 @@ Cấu hình cấp part trong `mapping.json`: `columns` (thứ tự cột output)
 ## Workflow chung
 
 ### Bước 1 — Xác định ngày báo cáo
-- Lấy từ cột Day/Ngày trong file FB, hoặc date range hiển thị trên ảnh Google/GPT Ads.
+- Lấy từ cột Day/Ngày/date trong file FB/GPT, hoặc date range hiển thị trên ảnh Google/GPT Ads.
 - Ảnh không thấy ngày và user không nói → hỏi **1 câu** duy nhất: "Số liệu này của ngày nào?"
 - Nhiều ngày → tách theo từng ngày, sắp xếp tăng dần.
 
-### Bước 2 — File (Facebook / Google / TikTok)
+### Bước 2 — File (Facebook / Google / TikTok / GPT)
 > macOS / môi trường chưa cài `pandas` global: thay `python` bằng `uv run -q --with pandas --with openpyxl python3`
 > (part có lead từ Supabase như DND: thêm `--with "psycopg[binary]"`).
 ```powershell
 python "<skill_dir>/scripts/parse_ads.py" "<fb.csv>" --part qh                      # file không kèm cờ = Facebook
+python "<skill_dir>/scripts/parse_ads.py" --part qh --fb "<fb.csv>" --gpt "<gpt.csv>"
 python "<skill_dir>/scripts/parse_ads.py" --part dnd --fb "<fb1>" --fb "<fb2>" --google "<gg.csv>" --tiktok "<tt.xlsx>"
 python "<skill_dir>/scripts/parse_ads.py" --part dnd --fb "<file>" --date 22/10/2026  # file không có cột ngày
 python "<skill_dir>/scripts/parse_ads.py" "<fb.csv>" --part qh --clicks all          # FB dùng Clicks (all)
